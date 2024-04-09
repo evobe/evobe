@@ -38,3 +38,7 @@ git commit -m "Added a thing" #manually committing without installing git, file 
 
 once a file is tracked it'll show M or A after it
 bought a domain finally peabrainproducts.com :) 
+
+## azure info
+
+apraz2024AKA@hotmail.com
