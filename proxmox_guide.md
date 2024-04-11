@@ -13,3 +13,4 @@ maybe not this case because no power supply fits
 5. update and upgrade again 
 6. select the proxmox node and click reboot
 7. create a VM
+
