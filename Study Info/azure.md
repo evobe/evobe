@@ -66,3 +66,14 @@ self service password reset does require all users to have a license that includ
 
 ---
 
+### MOS 6 - RBAC
+
+Role based helps treat all users 'the same' users are assigned to roles and that's that.  
+there are **a lot** of built in roles 
+storage accounts are normally secured by keys, CBAC (or claims based access control) this can be changed in the configuration pane, once that's changed any access using keys is immediately broken  
+how to assign users to the storage account? IAM panel - three basic kinds of roles (reader, owner, contributer)
+after getting access to data blobs through roles then when creating containers can add and view data  
+roles and assignments can be set very granularly and at every level, subscription, container, resource, etc.  
+custom roles can be made using old roles as a template or creating a completely new role  
+how to view all permissions to an object? -- under access controls there is role assignments, also in azure ad choose the user and view azure role assignments (for objects), assigned roles (for entra management)
+to deny you have to do it through azure blueprints - allows you to create from scratch or based on existing templates  
