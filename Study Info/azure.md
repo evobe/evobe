@@ -66,14 +66,34 @@ self service password reset does require all users to have a license that includ
 
 ---
 
-### MOS 6 - RBAC
+### MOD 6 - RBAC
 
 Role based helps treat all users 'the same' users are assigned to roles and that's that.  
 there are **a lot** of built in roles 
 storage accounts are normally secured by keys, CBAC (or claims based access control) this can be changed in the configuration pane, once that's changed any access using keys is immediately broken  
 how to assign users to the storage account? IAM panel - three basic kinds of roles (reader, owner, contributer)
 after getting access to data blobs through roles then when creating containers can add and view data  
-roles and assignments can be set very granularly and at every level, subscription, container, resource, etc.  
+roles and assignments can be set very granularly and at every level, subscription, container, resource, etc, also defined in json and have some special properties, action, notactions, assignable scope  
 custom roles can be made using old roles as a template or creating a completely new role  
 how to view all permissions to an object? -- under access controls there is role assignments, also in azure ad choose the user and view azure role assignments (for objects), assigned roles (for entra management)
 to deny you have to do it through azure blueprints - allows you to create from scratch or based on existing templates  
+
+**what I learned mod 6** - rbac management helps with security by assigning the same role to every person, helps with permission creep. this can be a trap though, there are a lot of clicks and it gets very granular, are you assigning permissions at the group or tenant level? or the subscription level? or even the file level? the highest permission still wins. denying users access is easier done by just not giving it to them, it's possible to create custom deny rules but not through the IAM panel
+
+### MOD 7 - MANAGE SUBSCRIPTIONS AND GOVERNANCE
+
+ACCOUNT - a user id, or an applications account, basis for authentication, roles security and access to resources, are assigned resources
+SUBSCRIPTION - an agreement with MS to use Azure services, resource usage gets billed to the payment method of the sub. not every tenant has a subscription, but to use services you need to use a subscription, sometimes multiple
+TENANT - a representation of an org, like a domain name, a dedicated instance of azure AD (entra) 'peabrain products', ms appends onmicrosoft.com to the end of all tenants automatically
+RESOURCE - any entity managed by azure, VMs, web apps, storage account, IP addresses, NICs, network security groups  
+RESOURCE GROUP - a collection of resources usually for logical management, resources can only belong to one resource group, can lock a resource group, read only or block delete, block even owners from making changes or deleting (of course an owner can remove a lock)
+you create a user, they're a part of a tenant (or AD), but in order to create a VM or something like that a subscription is needed or some way to bill, sometimes multiples subscriptions are used - so some resources are charged to one account and others to another
+**management groups** -  can contain subscriptions, another way to control permission levels at the subscription level, blueprints can contain a prototype subscription and then you can deploy from that level, can review activity done on the group in the activity logs section for that group  
+the subscription page shows the details and costs of the subscription, can break the cost down in several ways, can set pricing alerts for different events  
+Polices (written in json) allow for rules set - like minimum OS version, etc. polices can be assigned to subscriptions and resource groups, can also make exclusions, the exclusion can block or just report when the policy is violated, non-compliance message can also be set, the compliance tab allows you to see what does meet the policy and provide remediation, there are many templates and each template can be modified to fit specific use-cases
+how would you test a policy - most policies take about 30 min to enable
+tags allow you to logically manage resources and groups, a key/value pairing - SERVERS - production, 
+US - network, etc, details on who manages the resources, another way to manage without assigning to resource groups, no templates since this is all self made, can set a policy that enforces tags  
+resources can be moved from one resource group to another or even another subscription, or a region, once that's done things that depend on the resource need to be updated since the resource ID will change  
+policies can be managed through powershell also - it's actually better to get away from the portal and develop script sets  
+policies are pre-deployment security solutions and locks are post-deployment solutions  
