@@ -97,3 +97,54 @@ US - network, etc, details on who manages the resources, another way to manage w
 resources can be moved from one resource group to another or even another subscription, or a region, once that's done things that depend on the resource need to be updated since the resource ID will change  
 policies can be managed through powershell also - it's actually better to get away from the portal and develop script sets  
 policies are pre-deployment security solutions and locks are post-deployment solutions  
+
+### MOD 8 - creating storage accounts  
+
+**basics**  
+belong to one subscription and a resource group, needs a name too that becomes part of the URL, also needs to be globally unique  
+storage accounts are deployed to regions, pricing and governance can be different based on region and redundancy selections, best to closet to user  
+when making the account need to select redundancy options, even the lowest copy makes 3 copies in the same region, zone redundant two copies in different locations in same zone, geo redundant two regions, geo and zone two different regions and zones 
+
+**advanced tab**  
+this is where secure access, allowing anonymous users, storage key access, tls version, datalink endpoints, and *blob storage access tiers* - are configured (hot or cool - this also affects pricing), hot is for frequently used data and cool for backups, logs, etc. hot is cheaper to write to and cool is more expensive to read from - this can be changed later
+
+**networking**  
+here can set where the storage account can be accessed from (publicly or locked down to certain accounts) and how the routing works either using MS internal networking or the public network  
+
+**data protection**  
+recovery and tracking control -- soft delete allows for recovery up to 7 days, point in time allows for versioning, tracking allows blobs to be tracked with version number (this does increase cost), or can just keep a log of the changes without keeping the blob file, access control prevents unwanted deletion of files - log files, auditing files etc.  
+
+**encryption**  
+data is encrypted by default, options are MS managing encryption keys or locally managing the keys - if locally managed need a key vault and a managed identity, there is also another layer of encryption at the hardware layer, infrastructure encryption  
+
+**tags**  
+assigning tags .. then validate  
+
+containers on the storage dashboard is blob storage, it's a box to upload files into,  this can be done manually or through programs or something logically, how to access? with url AND access key
+fileshares are more traditional, creating a fileshare like a W drive or something like that using SMB...when you create one few types of access tiers will popup, once created it's browsable like a regular file explorer, connect it to the pc with a script but 445 needs to be able to get through
+queues -- like a messaging system between applications
+tables -- are kind of like a loose database, like that ms access
+
+**how to access files**  
+*access keys* - how to access files in storage accounts - access keys, every account gets 2, you can rotate keys manually or with a rotation reminder, once a key is regenerated all previous access is revoked
+another way to grant access is *shared access signatures* - under there you generate the key by selecting shared access signature, permissions you want to grant and then generate the token -- append to the end of the container string, there should be a question mark in the string but you have to append it, weird..the cleartext dates for access are in the string but also included is an encryption string based on the access key shown when generating the SAS -- these can also be created at the file level  
+another way is stored access policies - a condition on a shared access signature - these can be revoked as well, can be made in powershell .. making it is kind of like an abbreviated SAS key -- once made and back in the SAS screen for the file there will be a Stored Access policy that can be applied that automatically sets the other features .. since you can't delete keys willy nilly, you can delete policies though -- if a policy is assigned and then deleted access is revoked while retaining keys
+*entra id* - so keys are good, but what about enabling users internally? first it needs to be enabled in configuration, then the user needs to be added to a role in IAM - there can be conditions applied
+
+
+**redundant storage**  
+locally redundant = 3 additional copies in the same region  
+configuration can be changed though - under redundancy can change to other options, some might not be available in the region the storage account has been created in 
+geo redundant = files in another region  
+if read only redundancy is created then multiple endpoints are created (some for read only)
+once geo redundancy is configured then a failover can be done manually or automatically whenever access is lost - however some data may be lost, it also displays last sync time
+-what's a premium storage account? -- faster drive, better read write access, less space though - only supports page blobs, block blobs and file shares  
+back to access tiers - there are more than hot and cold, cool and archive are also available for files -- if tiers are moved there are some minimum charges based on days, 30, 120 for cool and cold. 180 for archiving takes the file offline completely, it's no longer accessible, just there - VERY CHEAP. hot files are expensive to store, cheap to write and read from. everything else is opposite to a degrees. 
+*soft delete* for fileshares, allowing for recovery allows for up to 365 days to recover, once soft delete is enabled a lock is created by default to disable deletion, once you remove that  
+*backups* - more fileshare stuff .. backups run regularly or can be done manually  
+*snapshot* - for fileshare thing to do before a change - take a snapshot - go into the backup and can retrieve individual files instead of restoring the whole share, does not expire.  
+**versioning**  
+for blobs - this can be turned on initially, enabling it means everytime a file is added it adds a version backup of the blob. consider storage costs, MS recommends keeping less that 1000x copies of a file. this can be rotated too. does not protect against container deletion, that's for soft deletion only for blob files
+deletion of backups, snapshots and versions can also be managed globally by lifecycle rules -- can move to different access tiers.  
+
+**what I learned here** --- again many ways to the top of the mountain. easy to trip over your own toes here when creating management polices are storage accounts. there are many options when making a storage account - what kind of files it'll hold, how to access, where to put, how to back it up, who can access. these can be configured at a high level when creating the storage account but then fine tuned later. always consider how the data is going to be used when assigning storage policies. some keywords, hot, cold, cool, archive, blob, containers, fileshares, access keys, shared access keys, storage account  
