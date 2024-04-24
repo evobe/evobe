@@ -73,10 +73,12 @@ there are **a lot** of built in roles
 storage accounts are normally secured by keys, CBAC (or claims based access control) this can be changed in the configuration pane, once that's changed any access using keys is immediately broken  
 how to assign users to the storage account? IAM panel - three basic kinds of roles (reader, owner, contributer)
 after getting access to data blobs through roles then when creating containers can add and view data  
-roles and assignments can be set very granularly and at every level, subscription, container, resource, etc, also defined in json and have some special properties, action, notactions, assignable scope  
+roles and assignments can be set very granularly and at every level, subscription, container, resource, etc, also defined in json and have some special properties, action, notations, assignable scope  
 custom roles can be made using old roles as a template or creating a completely new role  
 how to view all permissions to an object? -- under access controls there is role assignments, also in azure ad choose the user and view azure role assignments (for objects), assigned roles (for entra management)
 to deny you have to do it through azure blueprints - allows you to create from scratch or based on existing templates  
+assigned memberships allow for expiration of groups
+
 
 **what I learned mod 6** - rbac management helps with security by assigning the same role to every person, helps with permission creep. this can be a trap though, there are a lot of clicks and it gets very granular, are you assigning permissions at the group or tenant level? or the subscription level? or even the file level? the highest permission still wins. denying users access is easier done by just not giving it to them, it's possible to create custom deny rules but not through the IAM panel
 
@@ -130,6 +132,7 @@ tables -- are kind of like a loose database, like that ms access
 another way to grant access is *shared access signatures* - under there you generate the key by selecting shared access signature, permissions you want to grant and then generate the token -- append to the end of the container string, there should be a question mark in the string but you have to append it, weird..the cleartext dates for access are in the string but also included is an encryption string based on the access key shown when generating the SAS -- these can also be created at the file level  
 another way is stored access policies - a condition on a shared access signature - these can be revoked as well, can be made in powershell .. making it is kind of like an abbreviated SAS key -- once made and back in the SAS screen for the file there will be a Stored Access policy that can be applied that automatically sets the other features .. since you can't delete keys willy nilly, you can delete policies though -- if a policy is assigned and then deleted access is revoked while retaining keys
 *entra id* - so keys are good, but what about enabling users internally? first it needs to be enabled in configuration, then the user needs to be added to a role in IAM - there can be conditions applied
+data validation ? 
 
 
 **redundant storage**  
@@ -147,4 +150,47 @@ back to access tiers - there are more than hot and cold, cool and archive are al
 for blobs - this can be turned on initially, enabling it means everytime a file is added it adds a version backup of the blob. consider storage costs, MS recommends keeping less that 1000x copies of a file. this can be rotated too. does not protect against container deletion, that's for soft deletion only for blob files
 deletion of backups, snapshots and versions can also be managed globally by lifecycle rules -- can move to different access tiers.  
 
+**tracking**  
+monitoring allows tracking of file access, creation and latency, can create alerts for various events, workbooks are templates that have been created as templates of analytic types
+
 **what I learned here** --- again many ways to the top of the mountain. easy to trip over your own toes here when creating management polices are storage accounts. there are many options when making a storage account - what kind of files it'll hold, how to access, where to put, how to back it up, who can access. these can be configured at a high level when creating the storage account but then fine tuned later. always consider how the data is going to be used when assigning storage policies. some keywords, hot, cold, cool, archive, blob, containers, fileshares, access keys, shared access keys, storage account  
+
+### mod 10 - manage storage accounts
+
+lots of different ways to get data in and out of a storage account. little files it's OK to do manually ... large files need data box, that needs a license and azure will ship a physical USB drive to put data on ... smh. smallest job on that page allows the building of a job up to 1tb, the user provides their own disk and runs some tools to prep it.
+
+getting data out of azure is mostly the same - export instead of import and they ship the data to the user in another data box, the user can also ship sata drives back  
+
+azcopy is a cmd line tool that allows the user to run the copy process like an application - when installing can use the path option to allow it to be used freely from the cmd line  
+
+``` powershell
+azcopy  copy c:\mystuff <blobsasurl> #this will use a shared access signature or SAS
+```  
+
+managing storage accounts - storage browser can also be downloaded and connected to and can browse files locally. object replication physically moves files between storage containers i.e main to backup, etc. object replication could move and lifecycle management could do the rest, downgrade the file etc. move the object to target container before changing lifecyle, when replication is enabled change and versioning feed are going to be enabled - these are just records. it can be moved in the same storage account, just different containers. for object replication, it's asynchronous and there is no SLA on time
+
+### mod 11 - configure azure files
+
+new storage account has default of 5ptb (sick). mine only had 5 tb, whatever.  
+again blob vs file share > file share is going to be able to connect to a local network using SMB and has a real hierarchical structure, blobs do not have these features - can't point a VM fileshare to a blob, not all ISPs support SMB over the internet - better to use a VPN. Azure provides a script to connect but this only works on Windows server 2012 or higher 
+azure file sync allows use of a local network server and then have the files synced to the cloud, server is set as a cache and then, you create the sync service, download the software, install and register the servers - files stored on servers to be stored centrally in an azure file share that needs to be premade and handles the syncing and versioning of those files in the background  
+**premium storage accounts** -- for the most part standard general purpose does the job, premium tier allows for block or page blobs and file shares. the names refer to write sizes - blocks are written in blocks, low latency, fast writes, video processing, databases etc. page blobs are typically larger than blocks - used for storing files that don't require a lot of interaction - good for random read and writes, like log files. does not have global redundancy, global or zone only. block blobs can be a datalake - pages cannot, you still get recovery.  
+
+**what I learned in this module** - I need to make a local domain and test syncing to get closer to real life action. anyway, storage - containers can hold storage accounts, in the storage accounts files can be organized in a few different ways, file shares or blobs, blobs are great for read only access, web pictures, etc. file shares can connect to VMs, local servers etc through SMB like a regular file share. Regardless of how it's stored, files can be managed by a lifecycle, replicating, backing up, moving access tiers, moving containers etc can be managed through lifecycle management, replication and policies. premium storage accounts allow for more expensive (larger) read write operations but redundancy is lost. most storage account and file management can be done from the console but it's recommended to do it programmatically or from desktop apps. to import large files they send a physical file-share of proportionate size 😂.  
+
+### mod 12 -- creating a vm  (stuff I've never done)  
+
+when you create good to make a new resource group since several other resources will be created with it
+some new option - security type (standard, trusted launc virtual (tpm),confidential), azure spot discount (vm is cheaper but the runspace can be used by other paying customers preferentially), size (d series is standard normal VM, best to choose latest D series, B series (burstable) CPU can burst to higher speed sometimes, E series more memory (databases), F 2x performance, lots of other different options), username, allowed inbound ports (ssh is mostly for linux)
+**disks** - OS disk - can select type, a new vm has some temp storage - these are not good for storage. use a data disk (limits are selected by the size vm in previous screen), bitlocker can be enabled here and MS can store the key (isn't in free sub),  
+**networking** - every vm has to belong to a virtual network, virtual machine network region and vm region must be the same, options to select network range and some security options,  accelerated networking is for vm to vm communication, load balancer options either tcp/udp or web traffic preferred 
+**management** - ms defender is now turned on always, system assigned identity - allows you to assign a role to the machine as a user, enable azure ad login, auto shutdown options for testing or development, backup options, site recovery (duplication in another region), os auto updates (hotpatch allows updates with reboot),
+**monitoring** - alert rules - every alert costs 10c a month, diagnostics
+**advanced** - enable extensions before deploying the image, openssh, desired state config etc. options for privacy and further performance tweaks, the option to reserve a vm by paying for it in advance 🤣. proximity tries to keep the physical machines close in order to improve performance. so when you click create theres already a bunch of standing VMs with mostly my specs - it's grabbed renamed and rebooted, so strange. 
+
+connecting to a vm - few ways to connect, configured when created. however bastion is a new one - connect to it using azure ad and then log in using rdp. 
+connecting via rdp is a file - launch as normal. 
+
+
+DangerBoy
+JumpUp2Top33!
