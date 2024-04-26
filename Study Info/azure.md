@@ -79,8 +79,9 @@ how to view all permissions to an object? -- under access controls there is role
 to deny you have to do it through azure blueprints - allows you to create from scratch or based on existing templates  
 assigned memberships allow for expiration of groups
 
+#### what I learned mod 6
 
-**what I learned mod 6** - rbac management helps with security by assigning the same role to every person, helps with permission creep. this can be a trap though, there are a lot of clicks and it gets very granular, are you assigning permissions at the group or tenant level? or the subscription level? or even the file level? the highest permission still wins. denying users access is easier done by just not giving it to them, it's possible to create custom deny rules but not through the IAM panel
+ rbac management helps with security by assigning the same role to every person, helps with permission creep. this can be a trap though, there are a lot of clicks and it gets very granular, are you assigning permissions at the group or tenant level? or the subscription level? or even the file level? the highest permission still wins. denying users access is easier done by just not giving it to them, it's possible to create custom deny rules but not through the IAM panel
 
 ### MOD 7 - MANAGE SUBSCRIPTIONS AND GOVERNANCE
 
@@ -153,7 +154,9 @@ deletion of backups, snapshots and versions can also be managed globally by life
 **tracking**  
 monitoring allows tracking of file access, creation and latency, can create alerts for various events, workbooks are templates that have been created as templates of analytic types
 
-**what I learned here** --- again many ways to the top of the mountain. easy to trip over your own toes here when creating management polices are storage accounts. there are many options when making a storage account - what kind of files it'll hold, how to access, where to put, how to back it up, who can access. these can be configured at a high level when creating the storage account but then fine tuned later. always consider how the data is going to be used when assigning storage policies. some keywords, hot, cold, cool, archive, blob, containers, fileshares, access keys, shared access keys, storage account  
+#### what I learned here
+
+again many ways to the top of the mountain. easy to trip over your own toes here when creating management polices are storage accounts. there are many options when making a storage account - what kind of files it'll hold, how to access, where to put, how to back it up, who can access. these can be configured at a high level when creating the storage account but then fine tuned later. always consider how the data is going to be used when assigning storage policies. some keywords, hot, cold, cool, archive, blob, containers, fileshares, access keys, shared access keys, storage account  
 
 ### mod 10 - manage storage accounts
 
@@ -176,21 +179,60 @@ again blob vs file share > file share is going to be able to connect to a local 
 azure file sync allows use of a local network server and then have the files synced to the cloud, server is set as a cache and then, you create the sync service, download the software, install and register the servers - files stored on servers to be stored centrally in an azure file share that needs to be premade and handles the syncing and versioning of those files in the background  
 **premium storage accounts** -- for the most part standard general purpose does the job, premium tier allows for block or page blobs and file shares. the names refer to write sizes - blocks are written in blocks, low latency, fast writes, video processing, databases etc. page blobs are typically larger than blocks - used for storing files that don't require a lot of interaction - good for random read and writes, like log files. does not have global redundancy, global or zone only. block blobs can be a datalake - pages cannot, you still get recovery.  
 
-**what I learned in this module** - I need to make a local domain and test syncing to get closer to real life action. anyway, storage - containers can hold storage accounts, in the storage accounts files can be organized in a few different ways, file shares or blobs, blobs are great for read only access, web pictures, etc. file shares can connect to VMs, local servers etc through SMB like a regular file share. Regardless of how it's stored, files can be managed by a lifecycle, replicating, backing up, moving access tiers, moving containers etc can be managed through lifecycle management, replication and policies. premium storage accounts allow for more expensive (larger) read write operations but redundancy is lost. most storage account and file management can be done from the console but it's recommended to do it programmatically or from desktop apps. to import large files they send a physical file-share of proportionate size 😂.  
+#### what I learned in this module
 
-### mod 12 -- creating a vm  (stuff I've never done)  
+I need to make a local domain and test syncing to get closer to real life action. anyway, storage - containers can hold storage accounts, in the storage accounts files can be organized in a few different ways, file shares or blobs, blobs are great for read only access, web pictures, etc. file shares can connect to VMs, local servers etc through SMB like a regular file share. Regardless of how it's stored, files can be managed by a lifecycle, replicating, backing up, moving access tiers, moving containers etc can be managed through lifecycle management, replication and policies. premium storage accounts allow for more expensive (larger) read write operations but redundancy is lost. most storage account and file management can be done from the console but it's recommended to do it programmatically or from desktop apps. to import large files they send a physical file-share of proportionate size 😂.  
+
+### mod 12 -- VMS  (stuff I've never done)  
 
 when you create good to make a new resource group since several other resources will be created with it
-some new option - security type (standard, trusted launc virtual (tpm),confidential), azure spot discount (vm is cheaper but the runspace can be used by other paying customers preferentially), size (d series is standard normal VM, best to choose latest D series, B series (burstable) CPU can burst to higher speed sometimes, E series more memory (databases), F 2x performance, lots of other different options), username, allowed inbound ports (ssh is mostly for linux)
+some new option - security type (standard, trusted launch virtual (tpm),confidential), azure spot discount (vm is cheaper but the runspace can be used by other paying customers preferentially), size (d series is standard normal VM, best to choose latest D series, B series (burstable) CPU can burst to higher speed sometimes, E series more memory (databases), F 2x performance, lots of other different options), username, allowed inbound ports (ssh is mostly for linux)
 **disks** - OS disk - can select type, a new vm has some temp storage - these are not good for storage. use a data disk (limits are selected by the size vm in previous screen), bitlocker can be enabled here and MS can store the key (isn't in free sub),  
 **networking** - every vm has to belong to a virtual network, virtual machine network region and vm region must be the same, options to select network range and some security options,  accelerated networking is for vm to vm communication, load balancer options either tcp/udp or web traffic preferred 
 **management** - ms defender is now turned on always, system assigned identity - allows you to assign a role to the machine as a user, enable azure ad login, auto shutdown options for testing or development, backup options, site recovery (duplication in another region), os auto updates (hotpatch allows updates with reboot),
 **monitoring** - alert rules - every alert costs 10c a month, diagnostics
-**advanced** - enable extensions before deploying the image, openssh, desired state config etc. options for privacy and further performance tweaks, the option to reserve a vm by paying for it in advance 🤣. proximity tries to keep the physical machines close in order to improve performance. so when you click create theres already a bunch of standing VMs with mostly my specs - it's grabbed renamed and rebooted, so strange. 
+**advanced** - enable extensions before deploying the image, openssh, desired state config etc. options for privacy and further performance tweaks, the option to reserve a vm by paying for it in advance 🤣. proximity tries to keep the physical machines close in order to improve performance. so when you click create theres already a bunch of standing VMs with mostly my specs - it's grabbed renamed and rebooted, so strange.  
+**connecting to a vm** - few ways to connect, configured when created. however bastion is a new one - connect to it using azure ad and then log in using rdp.  
+connecting via rdp is a file - launch as normal.  
+another way is to use bastion -- a jump station basically, doesn't connect directly, no open ports needed or public IP, connect to second server - costs per hour 😊, basic and standard versions different features, different pricing - when bastion is deployed it's in the same resource group and same region but not in the same subnet at least \26, need multiple bastion servers if multiple people will connect, when connecting it's done through the browser, most secure way to connect to a vm  
+**availability**  - availability options  works when you have multiple vms with the same purpose, you create them as a set - fault domains, 2 fault domains 2  vms = completely different power sources and regions, update domains up to 20 are for planned maint. 
+the vm can be resized while it's running just head to size and change settings  
+**disks** - can add additional disks up to the size limit, premium or standard, can choose size and storage type, cost is based on provisioned amount not used amount, when a disk is added it must be added to the OS like a regular disk, can detach the disk while the machine is running - detaching does not delete the drive - it can be reattached in the disks pane - (how do you know how many disks are detached?)  
+**azure scale sets** - vertical vs horizontal - vertical is adding to the machine itself, more ram, more cpu, more disk space etc. - limits to scaling up, it's disruptive to the machine and it might not make things better, another way to scale is horizontally - adding more machines to the problem - no limit and it's not disruptive, ms uses *virtual machine scale set* service - when creating this resource same as bastion - need to add it to a resource group, orchestration  mode option - uniform vs flexible, flexible is good for many machines 30+ - does not use availability sets so each machine is actually different - can mix OSs etc - neat, traditional is all the same. they do not load balance automatically. there is a pretty detailed autoscaling feature within the scale set configuration, the default scale set limit is 100. can select applications to install on creation  
+**creating a vm in powershell** - most common way of creating a VM, powershell or bash
 
-connecting to a vm - few ways to connect, configured when created. however bastion is a new one - connect to it using azure ad and then log in using rdp. 
-connecting via rdp is a file - launch as normal. 
+```powershell
+#first create a resource group, don't have to but a good idea
+new-azresourcegroup -name xxx1 -location eastus
+new-azvm -name xxx -credential xxx -location eastus -resourcegroup xxx1 #only name and credential are mandatory
+```
 
+windows features can also be installed via powershell
+
+```powershell
+invoke-azvmruncommand -ResourceGroupName 'myrg' -VMName 'psazureabvm2024' -CommandId 'runpowershellscript' -scriptstring 'install-windowsfeature -name web-server -includemanagementtools'
+```
+
+the vm can also be started and stopped from powershell - anything that can be done in the portal can be done in PS, when the machine is stopped it's deallocated and that looses it's IP address so if you're using RDP you'll need a new connection
+
+```powershell
+stop-azvm -name xxx -resourcegroupname xxx
+start-azvm -name xxx -resourcegroupname xxx
+restart-azvm -name xxx -resourcegroupname xxx
+remove-azvm ....
+remove-azresourcegroup ....
+```
+
+this can also be done in bash 
+
+```bash
+az vm create --name xxx --resource-group xxx --image xxx
+az group delete --name xxx
+```
+
+#### what I learned mod 12
+
+azure vms are very flexible and built for scaling. every vm must belong to a resource group and have a virtual network. Can configure pretty much anything before load (powershell or cli is preferred), can use azure scale sets to scale in and out, many way to connect (bastion is preferred) - bastion runs on a subnet of the vm's network. vm configuration can be changed on the fly.  
 
 DangerBoy
 JumpUp2Top33!
