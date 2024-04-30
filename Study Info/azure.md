@@ -160,9 +160,11 @@ again many ways to the top of the mountain. easy to trip over your own toes here
 
 ### mod 10 - manage storage accounts
 
-lots of different ways to get data in and out of a storage account. little files it's OK to do manually ... large files need data box, that needs a license and azure will ship a physical USB drive to put data on ... smh. smallest job on that page allows the building of a job up to 1tb, the user provides their own disk and runs some tools to prep it.
+lots of different ways to get data in and out of a storage account. little files it's OK to do manually ... large files need data box, that needs a license and azure will ship a physical USB drive to put data on ... smh. smallest job on that page allows the building of a job up to 1tb, the user provides their own disk and runs some tools to prep it. azure backup needs trusted services to be used ... azure import/export is used to securely migrate large amounts of data to blob and file storage, there is the dataset csv file (list of files and folders) and the driveset csv file (list of directories) to prep for the job
 
 getting data out of azure is mostly the same - export instead of import and they ship the data to the user in another data box, the user can also ship sata drives back  
+
+
 
 azcopy is a cmd line tool that allows the user to run the copy process like an application - when installing can use the path option to allow it to be used freely from the cmd line  
 
@@ -175,9 +177,22 @@ managing storage accounts - storage browser can also be downloaded and connected
 ### mod 11 - configure azure files
 
 new storage account has default of 5ptb (sick). mine only had 5 tb, whatever.  
-again blob vs file share > file share is going to be able to connect to a local network using SMB and has a real hierarchical structure, blobs do not have these features - can't point a VM fileshare to a blob, not all ISPs support SMB over the internet - better to use a VPN. Azure provides a script to connect but this only works on Windows server 2012 or higher 
-azure file sync allows use of a local network server and then have the files synced to the cloud, server is set as a cache and then, you create the sync service, download the software, install and register the servers - files stored on servers to be stored centrally in an azure file share that needs to be premade and handles the syncing and versioning of those files in the background  
+again blob vs file share > file share is going to be able to connect to a local network using SMB and has a real hierarchical structure, blobs do not have these features - can't point a VM fileshare to a blob, not all ISPs support SMB over the internet - better to use a VPN. Azure provides a script to connect but this only works on Windows server 2012 or higher. however blobs are the best storage option in azure  
+
+``` bash
+azcopy make "https://[account-name].blob.core.windows.net/[top-level-resource-name]"
+#makes a blob object  
+```
+**azure storage explorer** - allows copying local files to azure using an application and the internet, it allows uploading, downloading and managing of blobs, files, queues and tbales
+**azure file sync** allows use of a local network server and then have the files synced to the cloud, server is set as a cache and then, you create the sync service, download the software, install and register the servers - files stored on servers to be stored centrally in an azure file share that needs to be premade and handles the syncing and versioning of those files in the background, accessible by SMB - multiple vms and servers sharing the same files, if a change is made on the cloud side takes 24 hours to update, does not overwrite files - just keeps the file and conflict number (up to 100 per file),  
 **premium storage accounts** -- for the most part standard general purpose does the job, premium tier allows for block or page blobs and file shares. the names refer to write sizes - blocks are written in blocks, low latency, fast writes, video processing, databases etc. page blobs are typically larger than blocks - used for storing files that don't require a lot of interaction - good for random read and writes, like log files. does not have global redundancy, global or zone only. block blobs can be a datalake - pages cannot, you still get recovery.  
+**redundancy tiers**
+Locally redundant storage (LRS) copies your data synchronously three times within a single physical location in the primary region. LRS is the least expensive replication option but is not recommended for applications requiring high availability.
+Zone-redundant storage (ZRS) copies your data synchronously across three Azure availability zones in the primary region. For applications requiring high availability.
+Geo-redundant storage (GRS) copies your data synchronously three times within a single physical location in the primary region using LRS. It then copies your data asynchronously to a single physical location in a secondary region that is hundreds of miles away from the primary region.
+Geo-zone-redundant storage (GZRS) copies your data synchronously across three Azure availability zones in the primary region using ZRS. It then copies your data asynchronously to a single physical location in the secondary region.
+
+![alt text](../images/image.png)
 
 #### what I learned in this module
 
@@ -198,7 +213,7 @@ another way is to use bastion -- a jump station basically, doesn't connect direc
 **availability**  - availability options  works when you have multiple vms with the same purpose, you create them as a set - fault domains, 2 fault domains 2  vms = completely different power sources and regions, update domains up to 20 are for planned maint. 
 the vm can be resized while it's running just head to size and change settings  
 **disks** - can add additional disks up to the size limit, premium or standard, can choose size and storage type, cost is based on provisioned amount not used amount, when a disk is added it must be added to the OS like a regular disk, can detach the disk while the machine is running - detaching does not delete the drive - it can be reattached in the disks pane - (how do you know how many disks are detached?)  
-**azure scale sets** - vertical vs horizontal - vertical is adding to the machine itself, more ram, more cpu, more disk space etc. - limits to scaling up, it's disruptive to the machine and it might not make things better, another way to scale is horizontally - adding more machines to the problem - no limit and it's not disruptive, ms uses *virtual machine scale set* service - when creating this resource same as bastion - need to add it to a resource group, orchestration  mode option - uniform vs flexible, flexible is good for many machines 30+ - does not use availability sets so each machine is actually different - can mix OSs etc - neat, traditional is all the same. they do not load balance automatically. there is a pretty detailed autoscaling feature within the scale set configuration, the default scale set limit is 100. can select applications to install on creation  
+**azure scale sets** - vertical vs horizontal - vertical is adding to the machine itself, more ram, more cpu, more disk space etc. - limits to scaling up, it's disruptive to the machine and it might not make things better, another way to scale is horizontally - adding more machines to the problem - no limit and it's not disruptive, ms uses *virtual machine scale set* service - when creating this resource same as bastion - need to add it to a resource group, orchestration  mode option - uniform vs flexible, flexible is good for many machines 30+ - does not use availability sets so each machine is actually different - can mix OSs etc - neat, traditional is all the same. they do not load balance automatically. there is a pretty detailed autoscaling feature within the scale set configuration, the default scale set limit is 100. can select applications to install on creation, can create a scale set from a template vm.  
 **creating a vm in powershell** - most common way of creating a VM, powershell or bash
 
 ```powershell
@@ -233,6 +248,22 @@ az group delete --name xxx
 #### what I learned mod 12
 
 azure vms are very flexible and built for scaling. every vm must belong to a resource group and have a virtual network. Can configure pretty much anything before load (powershell or cli is preferred), can use azure scale sets to scale in and out, many way to connect (bastion is preferred) - bastion runs on a subnet of the vm's network. vm configuration can be changed on the fly.  
+
+### mod 13 automate deployment of resources by using templates
+
+ARM templates -(azure resource management) centralized deployment model that's running in the background of all resource configuration ... written in json templates. after creating a resource at the end there is usually a 'download a template for automation' link that provides json file with all the settings that have been configured. 2 main files to create a resource - template file and parameters
+schema is a fixed string - content version allows versioning 
+template file - parameters - value that can be passed into the template , variables - come from inside the template not outside, resources - most important part (array so a lot of stuff, disk drive, network infrastructure, etc. etc.), outputs  . does not pass password into the the vm.  
+after modifying a template there are a few options -- add to library and deploy
+templates are being phased out -- template specs are the place to store them now
+for the most part when using template specs it's still manual process 
+if the same arm template is deployed again a diff check is done and only things that are changed are deployed.
+there are maximum amounts of templates allowed ...
+besides ARM templates there are bicep templates, write in bicep translate to ARM - supposedly easier in all aspects, read, write, learn
+
+``` powershell
+new-azresouredeployment #deploys a template in powershell
+```
 
 DangerBoy
 JumpUp2Top33!
