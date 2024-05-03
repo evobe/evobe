@@ -222,6 +222,9 @@ new-azresourcegroup -name xxx1 -location eastus
 new-azvm -name xxx -credential xxx -location eastus -resourcegroup xxx1 #only name and credential are mandatory
 ```
 
+extras -- downtime is caused by changing the vm size
+proximity placement - only in same region
+
 windows features can also be installed via powershell
 
 ```powershell
@@ -271,7 +274,7 @@ so usually in azure the hardware is unknown when using app services, code is upl
 advantages - lots of deployment options, integrations into github, networking, azure devops etc., a little like putting code on an IIS machine  
 **creating a web app** - have to choose where to publish it from, code, container, static web app, what kind of runtime stack you're using, language and version (.net, java, php, etc some are cross platform (what os it can be run on) some are not), region and zone redundancy, different compute plans for pricing are avail. *deployment screen* - can add continuous deployment for ease of deployment, just enable and connect to github, there are rules and filters available for setup too, *networking* - is pretty simple - access public network or allow internal networking access  
 
-**managing a web app** - once made under deployment slots can see the web app, can use like an A/B test can send some traffic to one and some to another or can swap which is production and which is not.  
+**managing a web app** - once made under deployment slots can see the web app, can use like an A/B test can send some traffic to one and some to another or can swap which is production and which is not.  web apps can only be associated with app service plans in the same region (app service plans = the compute resource underlying the app)
 
 - *deployment center* shows where the source code is coming from, sftp, github, bitbucket, etc.  
 - *configuration* - application settings allow for variable breakout in the code, sensitive values can be stored here, an api key or something like that. connection settings allow for the same with database settings. can mount files to be used on the app also, very similar to IIS settings,  
@@ -279,7 +282,22 @@ advantages - lots of deployment options, integrations into github, networking, a
 there are settings as well to scale up automatically when needed in those plans is something called azure compute units kinda gives an abstract on how to compare performance of deployments, scaling isn't disruptive, it can be done manually or automatically by rules needs scale in and scale out rules, doesn't drop the new instances automatically (on the premium plan it does)  
 
 - *backups* - backups are automatic every one hour up to 30 gb, no linked DBs are backed up. Kinda like IIS. But can create own custom backups.  
-- *network* - inbound, outbound and rules, source IP address for firewall rules, public IP address, can also have a custom domain. 
+- *network* - inbound, outbound and rules, source IP address for firewall rules, public IP address, can also have a custom domain.   
+
+extras -- load balancers - allow for source port and ip, dest port and ip and protocol to be managed, options handled by session persistance, *none* - any machine can handle, it's off  
+*client ip* - specifies that the same vm handle requests from same client ip
+*client ip and protocol* - specifies that the vm will handle the same ip and protocol source so another vm could possibly handle another protocol 
+
+### mod 16 - azure kubernetes
+
+kubernetes - 1 orchestration server and some nodes, runs on tops of a vm cluster  .. 
+to do any work with containers needs a container tool like docker or something, can turn compiled programs into a container
+there is also the azure container app which manages the kubernetes cluster for you, by default accepts traffic on port 80 and azure provides the dns name as well. serverless platform that allows for less infrastructure while running containerized apps
+a specific container instance can also be created ready to upload code into, can see status of requests in containers - logs section, container workloads are usually triggered. 
+
+
+
+
 
 DangerBoy
 JumpUp2Top33!
