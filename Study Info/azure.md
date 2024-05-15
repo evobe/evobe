@@ -18,7 +18,7 @@ update-module ...
 ### Identity management - MODULE 4 INTRODUCTION TO ENTRA ID  
 
 Entra is the cloud version of identity management, same but different than AD -- does not use Kerberos or LDAP uses OAUTH and SAML  
-there is a free tier, create users and groups but offers little else - no reporting, no SLA, no security features    
+there is a free tier, create users and groups but offers little else - no reporting, no SLA, no security features
 not all users need to be on paid plans, some can remain on the free tier, some can be p1, etc.  
 **account** - a person or app service account (managed identity)  
 **tenant**  - a business or corporation, a unique domain name, every account is part of a tenant  
@@ -28,7 +28,7 @@ not all users need to be on paid plans, some can remain on the free tier, some c
 global admin can do anything, first user, built in role  
 more roles are unlocked with the P2 tier  
 
-**Learned in mod 4** - how to add a custom domain, what is a tenant, creating a user account, creating a new tenant, some view settings 
+**Learned in mod 4** - how to add a custom domain, what is a tenant, creating a user account, creating a new tenant, some view settings
 **homework -- check these settings locally**
 
 ---
@@ -69,7 +69,7 @@ self service password reset does require all users to have a license that includ
 ### MOD 6 - RBAC
 
 Role based helps treat all users 'the same' users are assigned to roles and that's that.  
-there are **a lot** of built in roles 
+there are **a lot** of built in roles
 storage accounts are normally secured by keys, CBAC (or claims based access control) this can be changed in the configuration pane, once that's changed any access using keys is immediately broken  
 how to assign users to the storage account? IAM panel - three basic kinds of roles (reader, owner, contributer)
 after getting access to data blobs through roles then when creating containers can add and view data  
@@ -95,7 +95,7 @@ you create a user, they're a part of a tenant (or AD), but in order to create a 
 the subscription page shows the details and costs of the subscription, can break the cost down in several ways, can set pricing alerts for different events  
 Polices (written in json) allow for rules set - like minimum OS version, etc. polices can be assigned to subscriptions and resource groups, can also make exclusions, the exclusion can block or just report when the policy is violated, non-compliance message can also be set, the compliance tab allows you to see what does meet the policy and provide remediation, there are many templates and each template can be modified to fit specific use-cases
 how would you test a policy - most policies take about 30 min to enable
-tags allow you to logically manage resources and groups, a key/value pairing - SERVERS - production, 
+tags allow you to logically manage resources and groups, a key/value pairing - SERVERS - production,
 US - network, etc, details on who manages the resources, another way to manage without assigning to resource groups, no templates since this is all self made, can set a policy that enforces tags  
 resources can be moved from one resource group to another or even another subscription, or a region, once that's done things that depend on the resource need to be updated since the resource ID will change  
 policies can be managed through powershell also - it's actually better to get away from the portal and develop script sets  
@@ -106,7 +106,7 @@ policies are pre-deployment security solutions and locks are post-deployment sol
 **basics**  
 belong to one subscription and a resource group, needs a name too that becomes part of the URL, also needs to be globally unique  
 storage accounts are deployed to regions, pricing and governance can be different based on region and redundancy selections, best to closet to user  
-when making the account need to select redundancy options, even the lowest copy makes 3 copies in the same region, zone redundant two copies in different locations in same zone, geo redundant two regions, geo and zone two different regions and zones 
+when making the account need to select redundancy options, even the lowest copy makes 3 copies in the same region, zone redundant two copies in different locations in same zone, geo redundant two regions, geo and zone two different regions and zones
 
 **advanced tab**  
 this is where secure access, allowing anonymous users, storage key access, tls version, datalink endpoints, and *blob storage access tiers* - are configured (hot or cool - this also affects pricing), hot is for frequently used data and cool for backups, logs, etc. hot is cheaper to write to and cool is more expensive to read from - this can be changed later
@@ -133,17 +133,16 @@ tables -- are kind of like a loose database, like that ms access
 another way to grant access is *shared access signatures* - under there you generate the key by selecting shared access signature, permissions you want to grant and then generate the token -- append to the end of the container string, there should be a question mark in the string but you have to append it, weird..the cleartext dates for access are in the string but also included is an encryption string based on the access key shown when generating the SAS -- these can also be created at the file level  
 another way is stored access policies - a condition on a shared access signature - these can be revoked as well, can be made in powershell .. making it is kind of like an abbreviated SAS key -- once made and back in the SAS screen for the file there will be a Stored Access policy that can be applied that automatically sets the other features .. since you can't delete keys willy nilly, you can delete policies though -- if a policy is assigned and then deleted access is revoked while retaining keys
 *entra id* - so keys are good, but what about enabling users internally? first it needs to be enabled in configuration, then the user needs to be added to a role in IAM - there can be conditions applied
-data validation ? 
-
+data validation ?
 
 **redundant storage**  
 locally redundant = 3 additional copies in the same region  
-configuration can be changed though - under redundancy can change to other options, some might not be available in the region the storage account has been created in 
+configuration can be changed though - under redundancy can change to other options, some might not be available in the region the storage account has been created in
 geo redundant = files in another region  
 if read only redundancy is created then multiple endpoints are created (some for read only)
 once geo redundancy is configured then a failover can be done manually or automatically whenever access is lost - however some data may be lost, it also displays last sync time
 -what's a premium storage account? -- faster drive, better read write access, less space though - only supports page blobs, block blobs and file shares  
-back to access tiers - there are more than hot and cold, cool and archive are also available for files -- if tiers are moved there are some minimum charges based on days, 30, 120 for cool and cold. 180 for archiving takes the file offline completely, it's no longer accessible, just there - VERY CHEAP. hot files are expensive to store, cheap to write and read from. everything else is opposite to a degrees. 
+back to access tiers - there are more than hot and cold, cool and archive are also available for files -- if tiers are moved there are some minimum charges based on days, 30, 120 for cool and cold. 180 for archiving takes the file offline completely, it's no longer accessible, just there - VERY CHEAP. hot files are expensive to store, cheap to write and read from. everything else is opposite to a degrees.
 *soft delete* for fileshares, allowing for recovery allows for up to 365 days to recover, once soft delete is enabled a lock is created by default to disable deletion, once you remove that  
 *backups* - more fileshare stuff .. backups run regularly or can be done manually  
 *snapshot* - for fileshare thing to do before a change - take a snapshot - go into the backup and can retrieve individual files instead of restoring the whole share, does not expire.  
@@ -164,8 +163,6 @@ lots of different ways to get data in and out of a storage account. little files
 
 getting data out of azure is mostly the same - export instead of import and they ship the data to the user in another data box, the user can also ship sata drives back  
 
-
-
 azcopy is a cmd line tool that allows the user to run the copy process like an application - when installing can use the path option to allow it to be used freely from the cmd line  
 
 ``` powershell
@@ -183,6 +180,7 @@ again blob vs file share > file share is going to be able to connect to a local 
 azcopy make "https://[account-name].blob.core.windows.net/[top-level-resource-name]"
 #makes a blob object  
 ```
+
 **azure storage explorer** - allows copying local files to azure using an application and the internet, it allows uploading, downloading and managing of blobs, files, queues and tbales
 **azure file sync** allows use of a local network server and then have the files synced to the cloud, server is set as a cache and then, you create the sync service, download the software, install and register the servers - files stored on servers to be stored centrally in an azure file share that needs to be premade and handles the syncing and versioning of those files in the background, accessible by SMB - multiple vms and servers sharing the same files, if a change is made on the cloud side takes 24 hours to update, does not overwrite files - just keeps the file and conflict number (up to 100 per file),  
 **premium storage accounts** -- for the most part standard general purpose does the job, premium tier allows for block or page blobs and file shares. the names refer to write sizes - blocks are written in blocks, low latency, fast writes, video processing, databases etc. page blobs are typically larger than blocks - used for storing files that don't require a lot of interaction - good for random read and writes, like log files. does not have global redundancy, global or zone only. block blobs can be a datalake - pages cannot, you still get recovery.  
@@ -203,14 +201,14 @@ I need to make a local domain and test syncing to get closer to real life action
 when you create good to make a new resource group since several other resources will be created with it
 some new option - security type (standard, trusted launch virtual (tpm),confidential), azure spot discount (vm is cheaper but the runspace can be used by other paying customers preferentially), size (d series is standard normal VM, best to choose latest D series, B series (burstable) CPU can burst to higher speed sometimes, E series more memory (databases), F 2x performance, lots of other different options), username, allowed inbound ports (ssh is mostly for linux)
 **disks** - OS disk - can select type, a new vm has some temp storage - these are not good for storage. use a data disk (limits are selected by the size vm in previous screen), bitlocker can be enabled here and MS can store the key (isn't in free sub),  
-**networking** - every vm has to belong to a virtual network, virtual machine network region and vm region must be the same, options to select network range and some security options,  accelerated networking is for vm to vm communication, load balancer options either tcp/udp or web traffic preferred 
+**networking** - every vm has to belong to a virtual network, virtual machine network region and vm region must be the same, options to select network range and some security options,  accelerated networking is for vm to vm communication, load balancer options either tcp/udp or web traffic preferred
 **management** - ms defender is now turned on always, system assigned identity - allows you to assign a role to the machine as a user, enable azure ad login, auto shutdown options for testing or development, backup options, site recovery (duplication in another region), os auto updates (hotpatch allows updates with reboot),
 **monitoring** - alert rules - every alert costs 10c a month, diagnostics
 **advanced** - enable extensions before deploying the image, openssh, desired state config etc. options for privacy and further performance tweaks, the option to reserve a vm by paying for it in advance 🤣. proximity tries to keep the physical machines close in order to improve performance. so when you click create theres already a bunch of standing VMs with mostly my specs - it's grabbed renamed and rebooted, so strange.  
 **connecting to a vm** - few ways to connect, configured when created. however bastion is a new one - connect to it using azure ad and then log in using rdp.  
 connecting via rdp is a file - launch as normal.  
 another way is to use bastion -- a jump station basically, doesn't connect directly, no open ports needed or public IP, connect to second server - costs per hour 😊, basic and standard versions different features, different pricing - when bastion is deployed it's in the same resource group and same region but not in the same subnet at least \26, need multiple bastion servers if multiple people will connect, when connecting it's done through the browser, most secure way to connect to a vm  
-**availability**  - availability options  works when you have multiple vms with the same purpose, you create them as a set - fault domains, 2 fault domains 2  vms = completely different power sources and regions, update domains up to 20 are for planned maint. 
+**availability**  - availability options  works when you have multiple vms with the same purpose, you create them as a set - fault domains, 2 fault domains 2  vms = completely different power sources and regions, update domains up to 20 are for planned maint.
 the vm can be resized while it's running just head to size and change settings  
 **disks** - can add additional disks up to the size limit, premium or standard, can choose size and storage type, cost is based on provisioned amount not used amount, when a disk is added it must be added to the OS like a regular disk, can detach the disk while the machine is running - detaching does not delete the drive - it can be reattached in the disks pane - (how do you know how many disks are detached?)  
 **azure scale sets** - vertical vs horizontal - vertical is adding to the machine itself, more ram, more cpu, more disk space etc. - limits to scaling up, it's disruptive to the machine and it might not make things better, another way to scale is horizontally - adding more machines to the problem - no limit and it's not disruptive, ms uses *virtual machine scale set* service - when creating this resource same as bastion - need to add it to a resource group, orchestration  mode option - uniform vs flexible, flexible is good for many machines 30+ - does not use availability sets so each machine is actually different - can mix OSs etc - neat, traditional is all the same. they do not load balance automatically. there is a pretty detailed autoscaling feature within the scale set configuration, the default scale set limit is 100. can select applications to install on creation, can create a scale set from a template vm.  
@@ -241,7 +239,7 @@ remove-azvm ....
 remove-azresourcegroup ....
 ```
 
-this can also be done in bash 
+this can also be done in bash
 
 ```bash
 az vm create --name xxx --resource-group xxx --image xxx
@@ -255,11 +253,11 @@ azure vms are very flexible and built for scaling. every vm must belong to a res
 ### mod 13 automate deployment of resources by using templates
 
 ARM templates -(azure resource management) centralized deployment model that's running in the background of all resource configuration ... written in json templates. after creating a resource at the end there is usually a 'download a template for automation' link that provides json file with all the settings that have been configured. 2 main files to create a resource - template file and parameters
-schema is a fixed string - content version allows versioning 
+schema is a fixed string - content version allows versioning
 template file - parameters - value that can be passed into the template , variables - come from inside the template not outside, resources - most important part (array so a lot of stuff, disk drive, network infrastructure, etc. etc.), outputs  . does not pass password into the the vm.  
 after modifying a template there are a few options -- add to library and deploy
 templates are being phased out -- template specs are the place to store them now
-for the most part when using template specs it's still manual process 
+for the most part when using template specs it's still manual process
 if the same arm template is deployed again a diff check is done and only things that are changed are deployed.
 there are maximum amounts of templates allowed ...
 besides ARM templates there are bicep templates, write in bicep translate to ARM - supposedly easier in all aspects, read, write, learn
@@ -282,22 +280,74 @@ advantages - lots of deployment options, integrations into github, networking, a
 there are settings as well to scale up automatically when needed in those plans is something called azure compute units kinda gives an abstract on how to compare performance of deployments, scaling isn't disruptive, it can be done manually or automatically by rules needs scale in and scale out rules, doesn't drop the new instances automatically (on the premium plan it does)  
 
 - *backups* - backups are automatic every one hour up to 30 gb, no linked DBs are backed up. Kinda like IIS. But can create own custom backups.  
-- *network* - inbound, outbound and rules, source IP address for firewall rules, public IP address, can also have a custom domain.   
+- *network* - inbound, outbound and rules, source IP address for firewall rules, public IP address, can also have a custom domain.
 
 extras -- load balancers - allow for source port and ip, dest port and ip and protocol to be managed, options handled by session persistance, *none* - any machine can handle, it's off  
 *client ip* - specifies that the same vm handle requests from same client ip
-*client ip and protocol* - specifies that the vm will handle the same ip and protocol source so another vm could possibly handle another protocol 
+*client ip and protocol* - specifies that the vm will handle the same ip and protocol source so another vm could possibly handle another protocol
 
 ### mod 16 - azure kubernetes
 
-kubernetes - 1 orchestration server and some nodes, runs on tops of a vm cluster  .. 
+kubernetes - 1 orchestration server and some nodes, runs on tops of a vm cluster  ..
 to do any work with containers needs a container tool like docker or something, can turn compiled programs into a container
 there is also the azure container app which manages the kubernetes cluster for you, by default accepts traffic on port 80 and azure provides the dns name as well. serverless platform that allows for less infrastructure while running containerized apps
-a specific container instance can also be created ready to upload code into, can see status of requests in containers - logs section, container workloads are usually triggered. 
+a specific container instance can also be created ready to upload code into, can see status of requests in containers - logs section, container workloads are usually triggered.
+
+### mod 16 - containers
+
+package of code including dependencies in one image and then that image can be deployed anywhere on any platform, az-104 doesn't ask q's about kubernetes 😊.  
+container instances cannot be changed after creation in azure, need to be redeployed. MS pushes to use AKS which allows burstable scaling.  
+**azure container apps** - serverless containers - without managing the infrastructure which containers instances do require - when creating the app the quick-start image defines the settings it'll need. a little more control given than container instances over what traffic it'll accept and whether it will scale or not, more tie ins with key vaults, authentication etc.
+
+### mod 17 - virtual network
+
+virtual machines and networks must match.  
+ip address range can be changed after creation,  
+to associate a private ip a private IP resource must be created and then associated with the virtual network  
+to force traffic out of vm through the firewall need to create a user defined route or *route table* - use to route traffic to a certain area or firewall internally.  option to propagate routes is to associate this gateway with other subnets
+same firewall style as normal in classic mode.  
+**wan** 2 or more offices that need to communicate and now using ms as a hub to connect, like a site to site vpn
+this whole part is just general networking, the most interesting part is everything is created in parts, the network is created, a firewall is created - specific routes (for proxies and directing traffic to the firewall) are a completely different resource, then the firewall can have rules managing NAT  
 
 
+### mod 19 - virtual networking  
+
+company has a few networks - need to communicate securely between different virtual networks, *peering* sets up relationship between the two .. this is configured within the virtual networks settings under peerings, and IP addressing space must not overlap. to work peering links must be configured on each network, it will ask which sub and network to peer to -- can use dropdown or resource ID  
+what about global peering? - add a peer to a virtual network in another region of the world - difference between that and normal peering is - well it's just more expensive - costs go up  
+gateway subnets - always named gateway subnet, virtual network gateway used in site to site or point to site, this one is a separate resource, there are maximums in point to site as well. they have a public address, they can be set to use BGP or two lines in an active active profile best to create one for each zone, once they're made separate virtual networks can be connected without peering - this is done within the gateway, inbound traffic is free outbound traffic costs money, powershell is the only way to do vnet to vnet connectivity across subscriptions
 
 
+### mod 20 -- dns
+
+azure does provide dns by default -- gives access to vms to other pcs and internet.  
+azure private dns -- like a host file, only real in your network .. must have two labels (label.label) - exclusive to VMs  
+2 types of dns zones - public and private dns zones - basically the same as every other resource - needs a label
+when you create a vm you can add dns zone to it  
+public dns zones - for this need an actual domain name registered - you have to add ms namesevers to the registrars dns settings, can check if it's working by checking the SOA record. also need to add port 53 incoming traffic to the network security group associated with the vm   
+to delegate a subdomain. abra.alexander.com rather than alexander.com - use a NS record  
+only private dns zones can be registered automatically and virtual subnets can only be linked to private dns zones  
+what I learned here - adding gateways for virtual networks is pretty straightforward.
+
+---
+
+### mod 21 secure access to virtual networks
+
+using NSG (network security groups) - i.e internet traffic should not reach this destination or allows traffic only on a port -- a separate resource created with a vm, but minimize this number - fewer the less management - harder to manage = less secure.  
+nsgs are free - just need a location, region and name - default set of rules, allows local vnet traffic and an azure load balancer, all else is denied. it's a firewall style rule so goes top down.  the nsg needs to be attached to a network either a subnet or a interface card. done through the network interface for a vm. 
+*application security group* - instead of listing IP addresses it's just a group (security objects)  
+honestly I hate how they've broken down the firewall into it's separate parts in order to charge you more, ridiculous  
+txt or mx records for verifying domains
+
+### load balancing 
+
+a device that distributes internet traffic over multiple servers  
+lots of different skus .. some are free, standard and other paid tiers allow more instances and configuration
+
+my final hot take on azure --- expensive. expensive. expensive.
+
+vm: 10.0.0.4
+fw: 10.0.1.4  52.191.7.142
+vm pub - 52.168.5.40
 
 DangerBoy
 JumpUp2Top33!
