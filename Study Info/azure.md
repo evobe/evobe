@@ -78,6 +78,7 @@ custom roles can be made using old roles as a template or creating a completely 
 how to view all permissions to an object? -- under access controls there is role assignments, also in azure ad choose the user and view azure role assignments (for objects), assigned roles (for entra management)
 to deny you have to do it through azure blueprints - allows you to create from scratch or based on existing templates  
 assigned memberships allow for expiration of groups
+assignablescopes specify the scopes where a role definition can be assigned
 
 #### what I learned mod 6
 
@@ -95,6 +96,7 @@ you create a user, they're a part of a tenant (or AD), but in order to create a 
 the subscription page shows the details and costs of the subscription, can break the cost down in several ways, can set pricing alerts for different events  
 Polices (written in json) allow for rules set - like minimum OS version, etc. polices can be assigned to subscriptions and resource groups, can also make exclusions, the exclusion can block or just report when the policy is violated, non-compliance message can also be set, the compliance tab allows you to see what does meet the policy and provide remediation, there are many templates and each template can be modified to fit specific use-cases
 how would you test a policy - most policies take about 30 min to enable
+policy initiatves is a set of policy definitions that can be applied to new deployments
 tags allow you to logically manage resources and groups, a key/value pairing - SERVERS - production,
 US - network, etc, details on who manages the resources, another way to manage without assigning to resource groups, no templates since this is all self made, can set a policy that enforces tags  
 resources can be moved from one resource group to another or even another subscription, or a region, once that's done things that depend on the resource need to be updated since the resource ID will change  
@@ -341,9 +343,26 @@ txt or mx records for verifying domains
 ### load balancing 
 
 a device that distributes internet traffic over multiple servers  
-lots of different skus .. some are free, standard and other paid tiers allow more instances and configuration
+*making the load balancer*
+3 .. some are free, standard and gateway - basic for small scaled apps that don't need high availability or redundancy zones, standard supports IP based only, no SLA either  
+there is also public (balances incoming public traffic) or internal (balances internal traffic) load balancing setting  
+it can be tiered as well - cross region or just in one area  
+5 things needed ip, source, destination ip, destination port and protocol type
+load balancing rules - any traffic coming over ipv4 from public address will be sent to x pool to x port (can do NAT also)
+comes with a public IP address
+can add health probes
+*automating the creation of load balancers*  
+in github there are quickstart templates - one of these templates types are load balancers (under network)  and their accompanying network resources like extra vms and stuff
+*troubleshooting load balancers*
+frontend - (IP available to the world) - should be able to enter that IP into the browser and get a result, associated with rules
+backend pool - where the load balancer points, are they configured correctly? are they on so traffic is distributed correctly? health probes check the backend pool, can probe a few different things http, tcp and ports and paths - has the health probe been tripped? there can be an alert group created if the health probe has been tripped
+*application gateways*
+the previous load balancer only understands ip addresses and ports - this one understands urls and hostnames (layer 7) can also have a firewall associated with it.  
+few tiers associated with it standard or WAF (more security) same options as before interal or private application gateway .. more options for backend pools, gateways can also have security certificates
 
-my final hot take on azure --- expensive. expensive. expensive.
+
+
+my final hot take on azure --- expensive. expensive. expensive but interesting.
 
 vm: 10.0.0.4
 fw: 10.0.1.4  52.191.7.142
