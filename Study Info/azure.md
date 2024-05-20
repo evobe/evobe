@@ -360,6 +360,12 @@ backend pool - where the load balancer points, are they configured correctly? ar
 the previous load balancer only understands ip addresses and ports - this one understands urls and hostnames (layer 7) can also have a firewall associated with it.  
 few tiers associated with it standard or WAF (more security) same options as before interal or private application gateway .. more options for backend pools, gateways can also have security certificates
 
+### network watcher  
+two tools,  monitoring tools (topology, connection monitor) and network performance monitor .. tells you where the flow of traffic is going .. good way also to visit the virtual network topology, way to monitor packets going between azure endpoints  
+allows the creation of network tests between endpoints, source and destination - then add configurations to the test, port, headers, http request types, tests do have a cost per month  
+*ip flow verify* tool checks if a packet is allowed or denied to and from a virtual machine and tells what rule is being violated  
+inside the network watcher service is metrics under usage and quotas, another service is logs, various logs inbound, outbound, can create various rules with different criteria.  
+diagnostic logs - need to be turned on. different diagnostic logs for different resources - event and rule counter is for the NSG, bit of a lag when logging, just like a normal firewall log, realtime is approx. when creating a log, needs to be the same type of resource if grouping, queries are written in KOL(Kusto Query Language)
 
 
 my final hot take on azure --- expensive. expensive. expensive but interesting.
