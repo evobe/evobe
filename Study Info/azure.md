@@ -181,6 +181,7 @@ again blob vs file share > file share is going to be able to connect to a local 
 ``` bash
 azcopy make "https://[account-name].blob.core.windows.net/[top-level-resource-name]"
 #makes a blob object  
+azcopy #with sync options keeps both source and destination files in sync
 ```
 
 **azure storage explorer** - allows copying local files to azure using an application and the internet, it allows uploading, downloading and managing of blobs, files, queues and tbales
@@ -191,6 +192,13 @@ Locally redundant storage (LRS) copies your data synchronously three times withi
 Zone-redundant storage (ZRS) copies your data synchronously across three Azure availability zones in the primary region. For applications requiring high availability.
 Geo-redundant storage (GRS) copies your data synchronously three times within a single physical location in the primary region using LRS. It then copies your data asynchronously to a single physical location in a secondary region that is hundreds of miles away from the primary region.
 Geo-zone-redundant storage (GZRS) copies your data synchronously across three Azure availability zones in the primary region using ZRS. It then copies your data asynchronously to a single physical location in the secondary region.
+
+doing it in powershell
+```powershell
+add-azstorageaccountmanagementpolicyaction #the thing to do move to cool or hot
+new-azstorageaccountmanagementpolicyfilter #set prefixes and what to apply it to
+set-azstorageaccountmanagementpolicy
+```
 
 ![alt text](../images/image.png)
 
@@ -213,7 +221,7 @@ another way is to use bastion -- a jump station basically, doesn't connect direc
 **availability**  - availability options  works when you have multiple vms with the same purpose, you create them as a set - fault domains, 2 fault domains 2  vms = completely different power sources and regions, update domains up to 20 are for planned maint.
 the vm can be resized while it's running just head to size and change settings  
 **disks** - can add additional disks up to the size limit, premium or standard, can choose size and storage type, cost is based on provisioned amount not used amount, when a disk is added it must be added to the OS like a regular disk, can detach the disk while the machine is running - detaching does not delete the drive - it can be reattached in the disks pane - (how do you know how many disks are detached?)  
-**azure scale sets** - vertical vs horizontal - vertical is adding to the machine itself, more ram, more cpu, more disk space etc. - limits to scaling up, it's disruptive to the machine and it might not make things better, another way to scale is horizontally - adding more machines to the problem - no limit and it's not disruptive, ms uses *virtual machine scale set* service - when creating this resource same as bastion - need to add it to a resource group, orchestration  mode option - uniform vs flexible, flexible is good for many machines 30+ - does not use availability sets so each machine is actually different - can mix OSs etc - neat, traditional is all the same. they do not load balance automatically. there is a pretty detailed autoscaling feature within the scale set configuration, the default scale set limit is 100. can select applications to install on creation, can create a scale set from a template vm.  
+**azure scale sets** - vertical vs horizontal - vertical is adding to the machine itself, more ram, more cpu, more disk space etc. - limits to scaling up, it's disruptive to the machine and it might not make things better, another way to scale is horizontally - adding more machines to the problem - no limit and it's not disruptive, ms uses *virtual machine scale set* service - when creating this resource same as bastion - need to add it to a resource group, orchestration  mode option - uniform vs flexible, flexible is good for many machines 30+ - does not use availability sets so each machine is actually different - can mix OSs etc - neat, traditional is all the same. they do not load balance automatically. there is a pretty detailed autoscaling feature within the scale set configuration UNDER THE STANDARD PRICING TIER, the default scale set limit is 100. can select applications to install on creation, can create a scale set from a template vm.  
 **creating a vm in powershell** - most common way of creating a VM, powershell or bash
 
 ```powershell
@@ -248,6 +256,8 @@ az vm create --name xxx --resource-group xxx --image xxx
 az group delete --name xxx
 ```
 
+when restoring VMs they need to be created in the same region
+
 #### what I learned mod 12
 
 azure vms are very flexible and built for scaling. every vm must belong to a resource group and have a virtual network. Can configure pretty much anything before load (powershell or cli is preferred), can use azure scale sets to scale in and out, many way to connect (bastion is preferred) - bastion runs on a subnet of the vm's network. vm configuration can be changed on the fly.  
@@ -274,6 +284,14 @@ so usually in azure the hardware is unknown when using app services, code is upl
 advantages - lots of deployment options, integrations into github, networking, azure devops etc., a little like putting code on an IIS machine  
 **creating a web app** - have to choose where to publish it from, code, container, static web app, what kind of runtime stack you're using, language and version (.net, java, php, etc some are cross platform (what os it can be run on) some are not), region and zone redundancy, different compute plans for pricing are avail. *deployment screen* - can add continuous deployment for ease of deployment, just enable and connect to github, there are rules and filters available for setup too, *networking* - is pretty simple - access public network or allow internal networking access  
 
+``` powershell
+new-azresourcegroup  
+new-azappserviceplan  #defines the azure compute resource required by the azure web app serive to run
+new-azwebapp  
+new-azwebappslot #creates an azure web app slot to stage the web app for testing
+#swapping an app
+
+```
 **managing a web app** - once made under deployment slots can see the web app, can use like an A/B test can send some traffic to one and some to another or can swap which is production and which is not.  web apps can only be associated with app service plans in the same region (app service plans = the compute resource underlying the app)
 
 - *deployment center* shows where the source code is coming from, sftp, github, bitbucket, etc.  
@@ -330,6 +348,16 @@ to delegate a subdomain. abra.alexander.com rather than alexander.com - use a NS
 only private dns zones can be registered automatically and virtual subnets can only be linked to private dns zones  
 what I learned here - adding gateways for virtual networks is pretty straightforward.
 
+doing it in powershell
+```powershell
+new-azdnsrecordset -name "@" -recordtype A -zonename "company1.com" -resourcegroupname "myresourcegroup" -ttl 3600 -dnsrecords #first configure the root with the @ and the ttl is in seconds
+(new-azdnsrcordconfig -ipv4address "1.2.3.4") #alias for www 
+$arecords = @()
+$arecords += new-azdnsrecordconfig -ipv4address "2.3.4.5"
+new-azdnsrecordset -name "www" -zonename "company1.com" -resourcegroupname mrg -ttl 3600 -recordtype A -dnsrecords $arecords #create a new record set with the info above
+```
+
+
 ---
 
 ### mod 21 secure access to virtual networks
@@ -359,6 +387,7 @@ backend pool - where the load balancer points, are they configured correctly? ar
 *application gateways*
 the previous load balancer only understands ip addresses and ports - this one understands urls and hostnames (layer 7) can also have a firewall associated with it.  
 few tiers associated with it standard or WAF (more security) same options as before interal or private application gateway .. more options for backend pools, gateways can also have security certificates
+standard outbound load balancer uses all IPs at the same time
 
 ### network watcher  
 two tools,  monitoring tools (topology, connection monitor) and network performance monitor .. tells you where the flow of traffic is going .. good way also to visit the virtual network topology, way to monitor packets going between azure endpoints  
@@ -367,6 +396,8 @@ allows the creation of network tests between endpoints, source and destination -
 inside the network watcher service is metrics under usage and quotas, another service is logs, various logs inbound, outbound, can create various rules with different criteria.  
 diagnostic logs - need to be turned on. different diagnostic logs for different resources - event and rule counter is for the NSG, bit of a lag when logging, just like a normal firewall log, realtime is approx. when creating a log, needs to be the same type of resource if grouping, queries are written in KOL(Kusto Query Language)
 
+### backup 
+disaster recovery - configure a NSG in the target region, create a recovery plan, customize the plan and then create a traffic manager plan (this allows to test source and target and redirect traffic if something is broken)
 
 my final hot take on azure --- expensive. expensive. expensive but interesting.
 
