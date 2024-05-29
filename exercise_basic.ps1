@@ -12,6 +12,7 @@ switch ($answer) {
     }
 }
 
+$selector = Get-Random -min 1 -max 10
 
 switch ($rando){
     {$_ -eq 1} {write-host "you're running";
