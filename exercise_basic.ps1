@@ -1,24 +1,33 @@
 #getting list of last exercise offered
 $donelist = ".\done_list.csv"
 $tpast = get-content $donelist | Select-Object -Last 1
-write-host = "Welcome! The last workout offered was - $tpast - did you complete?"
-$workoutanswer = read-host "Did you complete the workout? y/n"
-if($workoutanswer.ToUpper() -eq "Y"){
-    write-host "Great job! The workout has been marked as completed. Let's get at it!"
-    $newlast = $tpast + ",done"
-    (Get-Content $donelist) + $newlast | Set-Content -Path $donelist
-} elseif ($workoutanswer.ToUpper() -eq "N") {
-    Write-Host "That's OK - do you want to repeat the workout ?"
-    $repeat = read-host "y/n"
-    if($repeat.ToUpper() -eq "Y"){
-        write-host "Today's workout is $tpast - enjoy!"
-        $todai = $tpast
-    }elseif($repeat.ToUpper() -eq "N"){
-        write-host "OK - new workout being served"
-    } else {write-host "you did not enter y or n and I have no way of dealing with that right now so start over"}
-}else{
-    write-host "did not enter y or n and I have no way of dealing with that right now so start over"
+
+#talking to me
+if($tpast -notlike "*done"){
+    write-host "Welcome! The last workout offered was - $tpast - did you complete?";
+    $workoutanswer = read-host "Did you complete the workout? y/n"  
+    if($workoutanswer.ToUpper() -eq "Y"){
+        write-host "Great job! The workout has been marked as completed. Let's get at it!"
+        #set newlast as the last workout plus done
+        $newlast = $tpast.trimend() + ",done"
+        (Get-Content $donelist) + $newlast | Set-Content -Path $donelist 
+    } elseif ($workoutanswer.ToUpper() -eq "N") {
+        Write-Host "That's OK - do you want to repeat the workout ?"
+        $repeat = read-host "y/n"
+        if($repeat.ToUpper() -eq "Y"){
+            write-host "Today's workout is $tpast - enjoy!"
+            $todai = $tpast
+        }elseif($repeat.ToUpper() -eq "N"){
+            write-host "OK - new workout being served"
+        } else {write-host "you did not enter y or n and I have no way of dealing with that right now so start over"}
+    }else{
+        write-host "did not enter y or n and I have no way of dealing with that right now so start over"
+    }
+    }
+else{
+    write-host "Welcome! "
 }
+
 #setting up an exercise selection menu
 $workout = import-csv .\Elist.txt -Delimiter ',' 
 write-host "Let's get it, ready for a new workout? Or do you want to review past workouts"
@@ -99,9 +108,11 @@ switch ($rando){
 
 $daydate = get-date -Format "ddd MM/dd/yyyy"
 
-add-content -Path $donelist.trimend() -Value "`n$daydate, $value, $todai"
+
+add-content -Path $donelist.trimend() -Value "$daydate, $value, $todai"
 
 <## it works! - some scenarios - skip workout if it already says done.
 check date on last workout, if last workout is more than 5 days ask to repeat
 figure out why there's a space
+https://www.partitionwizard.com/partitionmanager/powershell-replace.html
 ##>
