@@ -1,6 +1,7 @@
 #getting list of last exercise offered
 $donelist = ".\done_list.csv"
 $tpast = get-content $donelist | Select-Object -Last 1
+$gotlist = get-content $donelist
 
 #talking to me
 if($tpast -notlike "*done"){
@@ -9,8 +10,11 @@ if($tpast -notlike "*done"){
     if($workoutanswer.ToUpper() -eq "Y"){
         write-host "Great job! The workout has been marked as completed. Let's get at it!"
         #set newlast as the last workout plus done
-        $newlast = $tpast.trimend() + ",done"
-        (Get-Content $donelist) + $newlast | Set-Content -Path $donelist 
+        $newlast = $tpast + ",done"
+        #different and more direct way to replace the last line - we just delete it and add another
+        $gotlist = $gotlist[0..($gotlist.count -2)]
+        $gotlist += $newlast
+        $gotlist | Set-Content  $donelist
     } elseif ($workoutanswer.ToUpper() -eq "N") {
         Write-Host "That's OK - do you want to repeat the workout ?"
         $repeat = read-host "y/n"
